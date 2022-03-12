@@ -279,7 +279,7 @@ const formatRecords = (recs,columns,hydrate,formatOptions) => {
   return recs ? recs.map(rec => {
 
     // Reduce each field in the record (row)
-    return rec.reduce((acc,field,i) => {
+    const records = rec.reduce((acc,field,i) => {
 
       // If the field is null, always return null
       if (field.isNull === true) {
@@ -312,6 +312,22 @@ const formatRecords = (recs,columns,hydrate,formatOptions) => {
       }
 
     }, hydrate ? {} : []) // init object if hydrate, else init array
+    
+     // ===== CUSTOM TOOLBOX CODE ===== //
+    const parseValidJSONValues = inputObject => {
+      const deepCopy = { ...inputObject };
+      Object.keys(inputObject).forEach(key => {
+        try {
+          let validParsedJSON = JSON.parse(inputObject[key]);
+          deepCopy[key] = validParsedJSON;
+        } catch {}
+      });
+      return deepCopy;
+    };
+
+    return hydrate ? parseValidJSONValues(records) : records;
+    // ===== END TOOLBOX CODE ===== //
+    
   }) : [] // empty record set returns an array
 } // end formatRecords
 
